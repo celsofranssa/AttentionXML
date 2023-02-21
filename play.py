@@ -5,13 +5,13 @@ import pandas as pd
 
 
 def load_ids(dataset, fold_idx, split):
-    with open(f"resource/dataset/{dataset}/fold_{fold_idx}/{split}.pkl", "rb") as ids_file:
+    with open(f"data/folded_datasets/{dataset}/fold_{fold_idx}/{split}.pkl", "rb") as ids_file:
         return pickle.load(ids_file)
 
 
 def prepare_data(dataset, fold_idx, split):
     ids = load_ids(dataset, fold_idx, split)
-    with open(f"resource/dataset/{dataset}/samples.pkl", "rb") as samples_file:
+    with open(f"data/folded_datasets/{dataset}/samples.pkl", "rb") as samples_file:
         samples_df = pd.DataFrame(pickle.load(samples_file))
     samples_df = samples_df[samples_df["idx"].isin(ids)]
     checkpoint_samples(samples_df, dataset, split)
