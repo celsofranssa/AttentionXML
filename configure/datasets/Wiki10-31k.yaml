@@ -1,0 +1,22 @@
+name: Wiki10-31k
+
+train:
+  texts: data/Wiki10-31k/train_texts.npy
+  labels: data/Wiki10-31k/train_labels.npy
+
+valid:
+  size: 200
+
+test:
+  texts: data/Wiki10-31k/test_texts.npy
+
+embedding:
+  emb_init: data/Wiki10-31k/emb_init.npy
+
+output:
+  res: results
+
+labels_binarizer: data/Wiki10-31k/labels_binarizer
+
+model:
+  emb_size: 300
