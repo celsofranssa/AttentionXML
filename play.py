@@ -28,7 +28,7 @@ def checkpoint_samples(samples_df, dataset, split):
 
 
 if __name__ == '__main__':
-    dataset = "Wiki10-31K"
+    dataset = "Wiki10-31k"
     fold_idx = 0
     prepare_data(dataset, fold_idx, "train")
     prepare_data(dataset, fold_idx, "test")
