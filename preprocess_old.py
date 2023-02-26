@@ -1,9 +1,15 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8
+"""
+Created on 2019/1/20
+@author yrh
+
+"""
+
 import os
-import pickle
 import re
 import click
 import numpy as np
-import pandas as pd
 from nltk.tokenize import word_tokenize
 from tqdm import tqdm
 from logzero import logger
@@ -17,44 +23,17 @@ def tokenize(sentence: str, sep='/SEP/'):
             if len(re.sub(r'[^\w]', '', token)) > 0]
 
 
-def load_ids(dataset, fold_idx, split):
-    with open(f"resource/dataset/{dataset}/fold_{fold_idx}/{split}.pkl", "rb") as ids_file:
-        return pickle.load(ids_file)
-
-
-def prepare_data(dataset, fold_idx, split):
-    ids = load_ids(dataset, fold_idx, split)
-    with open(f"resource/dataset/{dataset}/samples.pkl", "rb") as samples_file:
-        samples_df = pd.DataFrame(pickle.load(samples_file))
-    samples_df = samples_df[samples_df["idx"].isin(ids)]
-    checkpoint_samples(samples_df, dataset, split)
-
-
-def checkpoint_samples(samples_df, dataset, split):
-    dataset_dir = f"resource/dataset/{dataset}/"
-    samples_df["text"] = samples_df["text"].apply(lambda text: text.replace("\n", " "))
-    samples_df["text"].to_csv(f"{dataset_dir}{split}_raw_texts.txt", header=False, index=False)
-
-    samples_df["labels_ids"] = samples_df["labels_ids"].apply(lambda labels_ids: " ".join([str(idx) for idx in labels_ids]))
-    samples_df["labels_ids"].to_csv(f"{dataset_dir}{split}_labels.txt", header=False, index=False)
-
-
 @click.command()
-@click.option('--dataset', help='Name of dataset.')
-@click.option('--fold', help='Fold idx.')
-@click.option('--text-path', type=click.Path(), help='Path of text.')
+@click.option('--text-path', type=click.Path(exists=True), help='Path of text.')
 @click.option('--tokenized-path', type=click.Path(), default=None, help='Path of tokenized text.')
-@click.option('--label-path', type=click.Path(), default=None, help='Path of labels.')
+@click.option('--label-path', type=click.Path(exists=True), default=None, help='Path of labels.')
 @click.option('--vocab-path', type=click.Path(), default=None,
               help='Path of vocab, if it doesn\'t exit, build one and save it.')
 @click.option('--emb-path', type=click.Path(), default=None, help='Path of word embedding.')
 @click.option('--w2v-model', type=click.Path(), default=None, help='Path of Gensim Word2Vec Model.')
 @click.option('--vocab-size', type=click.INT, default=500000, help='Size of vocab.')
 @click.option('--max-len', type=click.INT, default=500, help='Truncated length.')
-def main(dataset, fold, text_path, tokenized_path, label_path, vocab_path, emb_path, w2v_model, vocab_size, max_len):
-    prepare_data(dataset, fold, "train")
-    prepare_data(dataset, fold, "test")
-
+def main(text_path, tokenized_path, label_path, vocab_path, emb_path, w2v_model, vocab_size, max_len):
     if tokenized_path is not None:
         logger.info(F'Tokenizing Text. {text_path}')
         with open(text_path) as fp, open(tokenized_path, 'w') as fout:

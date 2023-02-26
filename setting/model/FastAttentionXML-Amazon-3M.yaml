@@ -28,4 +28,4 @@ valid:
 predict:
   batch_size: 200
 
-path: models
+path: model

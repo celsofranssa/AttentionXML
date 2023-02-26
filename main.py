@@ -23,8 +23,8 @@ from deepxml.networks import AttentionRNN
 
 
 @click.command()
-@click.option('-d', '--data-cnf', type=click.Path(exists=True), help='Path of dataset configure yaml.')
-@click.option('-m', '--model-cnf', type=click.Path(exists=True), help='Path of model configure yaml.')
+@click.option('-d', '--data-cnf', type=click.Path(exists=True), help='Path of dataset setting yaml.')
+@click.option('-m', '--model-cnf', type=click.Path(exists=True), help='Path of model setting yaml.')
 @click.option('--mode', type=click.Choice(['train', 'eval']), default=None)
 @click.option('-t', '--tree-id', type=click.INT, default=None)
 def main(data_cnf, model_cnf, mode, tree_id):

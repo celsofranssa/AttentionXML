@@ -39,14 +39,14 @@ XML experiments in paper can be run directly such as:
 
 Run preprocess.py for train and test datasets with tokenized texts as follows:
 ```bash
-python preprocess.py \
+python preprocess_old.py \
 --text-path data/EUR-Lex/train_texts.txt \
 --label-path data/EUR-Lex/train_labels.txt \
 --vocab-path data/EUR-Lex/vocab.npy \
 --emb-path data/EUR-Lex/emb_init.npy \
 --w2v-model data/glove.840B.300d.gensim
 
-python preprocess.py \
+python preprocess_old.py \
 --text-path data/EUR-Lex/test_texts.txt \
 --label-path data/EUR-Lex/test_labels.txt \
 --vocab-path data/EUR-Lex/vocab.npy 
@@ -54,7 +54,7 @@ python preprocess.py \
 
 Or run preprocss.py including tokenizing the raw texts by NLTK as follows:
 ```bash
-python preprocess.py \
+python preprocess_old.py \
 --text-path data/Wiki10-31K/train_raw_texts.txt \
 --tokenized-path data/Wiki10-31K/train_texts.txt \
 --label-path data/Wiki10-31K/train_labels.txt \
@@ -62,7 +62,7 @@ python preprocess.py \
 --emb-path data/Wiki10-31K/emb_init.npy \
 --w2v-model data/glove.840B.300d.gensim
 
-python preprocess.py \
+python preprocess_old.py \
 --text-path data/Wiki10-31K/test_raw_texts.txt \
 --tokenized-path data/Wiki10-31K/test_texts.txt \
 --label-path data/Wiki10-31K/test_labels.txt \
@@ -74,7 +74,7 @@ python preprocess.py \
 
 Train and predict as follows:
 ```bash
-python main.py --data-cnf configure/datasets/EUR-Lex.yaml --model-cnf configure/models/AttentionXML-EUR-Lex.yaml 
+python main.py --data-cnf setting/dataset/EUR-Lex.yaml --model-cnf setting/model/AttentionXML-EUR-Lex.yaml 
 ```
 
 Or do prediction only with option "--mode eval".
@@ -83,9 +83,9 @@ Or do prediction only with option "--mode eval".
 
 Train and predict with an ensemble:
 ```bash
-python main.py --data-cnf configure/datasets/Wiki-500K.yaml --model-cnf configure/models/FastAttentionXML-Wiki-500K.yaml -t 0
-python main.py --data-cnf configure/datasets/Wiki-500K.yaml --model-cnf configure/models/FastAttentionXML-Wiki-500K.yaml -t 1
-python main.py --data-cnf configure/datasets/Wiki-500K.yaml --model-cnf configure/models/FastAttentionXML-Wiki-500K.yaml -t 2
+python main.py --data-cnf setting/dataset/Wiki-500K.yaml --model-cnf setting/model/FastAttentionXML-Wiki-500K.yaml -t 0
+python main.py --data-cnf setting/dataset/Wiki-500K.yaml --model-cnf setting/model/FastAttentionXML-Wiki-500K.yaml -t 1
+python main.py --data-cnf setting/dataset/Wiki-500K.yaml --model-cnf setting/model/FastAttentionXML-Wiki-500K.yaml -t 2
 python ensemble.py -p results/FastAttentionXML-Wiki-500K -t 3
 ```
 

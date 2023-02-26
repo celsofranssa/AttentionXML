@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-DATA=Wiki10-31K
+DATA=Wiki10-31k
 MODEL=AttentionXML
 
 ./scripts/run_preprocess.sh $DATA

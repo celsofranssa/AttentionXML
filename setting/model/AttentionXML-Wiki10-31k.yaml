@@ -8,14 +8,14 @@ model:
   emb_trainable: False
 
 train:
-  batch_size: 40
+  batch_size: 32
   nb_epoch: 30
-  swa_warmup: 10
+  swa_warmup: 4
 
 valid:
-  batch_size: 40
+  batch_size: 32
 
 predict:
-  batch_size: 40
+  batch_size: 32
 
-path: models
+path: resource/model_checkpoint
