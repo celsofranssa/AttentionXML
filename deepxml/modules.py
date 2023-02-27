@@ -54,7 +54,7 @@ class LSTMEncoder(nn.Module):
         init_state = self.init_state.repeat([1, inputs.size(0), 1])
         cell_init, hidden_init = init_state[:init_state.size(0)//2], init_state[init_state.size(0)//2:]
         idx = torch.argsort(lengths, descending=True)
-        packed_inputs = nn.utils.rnn.pack_padded_sequence(inputs[idx], lengths[idx], batch_first=True)
+        packed_inputs = nn.utils.rnn.pack_padded_sequence(inputs[idx], lengths[idx].to("cpu"), batch_first=True)
         outputs, _ = nn.utils.rnn.pad_packed_sequence(
             self.lstm(packed_inputs, (hidden_init, cell_init))[0], batch_first=True)
         return self.dropout(outputs[torch.argsort(idx)])
@@ -71,7 +71,7 @@ class MLAttention(nn.Module):
 
     def forward(self, inputs, masks):
         masks = torch.unsqueeze(masks, 1)  # N, 1, L
-        attention = self.attention(inputs).transpose(1, 2).masked_fill(1.0 - masks, -np.inf)  # N, labels_num, L
+        attention = self.attention(inputs).transpose(1, 2).masked_fill(~masks, -np.inf)  # N, labels_num, L
         attention = F.softmax(attention, -1)
         return attention @ inputs   # N, labels_num, hidden_size
 

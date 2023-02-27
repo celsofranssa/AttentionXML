@@ -101,8 +101,8 @@ class Model(object):
             total_norm = torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm * self.gradient_clip_value)
             self.gradient_norm_queue.append(min(total_norm, max_norm * 2.0, 1.0))
             if total_norm > max_norm * self.gradient_clip_value:
-                logger.warn(F'Clipping gradients with total norm {round(total_norm, 5)} '
-                            F'and max norm {round(max_norm, 5)}')
+                logger.warn(F'Clipping gradients with total norm {torch.round(total_norm, decimals=3)} '
+                            F'and max norm {torch.round(max_norm, decimals=3)}')
 
     def swa_init(self):
         if 'swa' not in self.state:
