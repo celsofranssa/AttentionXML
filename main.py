@@ -54,7 +54,7 @@ def main(data_cnf, model_cnf, mode, tree_id):
         logger.info(F'Size of Validation Set: {len(valid_x)}')
 
         logger.info('Training')
-        if 'cluster' not in model_cnf:
+        if 'cluster' in model_cnf:
             logger.info('Reading Data')
             train_loader = DataLoader(MultiLabelDataset(train_x, train_y),
                                       model_cnf['train']['batch_size'], shuffle=True, num_workers=4)
