@@ -55,15 +55,18 @@ def main(data_cnf, model_cnf, mode, tree_id):
 
         logger.info('Training')
         if 'cluster' not in model_cnf:
+            logger.info('Reading Data')
             train_loader = DataLoader(MultiLabelDataset(train_x, train_y),
                                       model_cnf['train']['batch_size'], shuffle=True, num_workers=4)
             valid_loader = DataLoader(MultiLabelDataset(valid_x, valid_y, training=False),
                                       model_cnf['valid']['batch_size'], num_workers=4)
             model = Model(network=AttentionRNN, labels_num=labels_num, model_path=model_path, emb_init=emb_init,
                           **data_cnf['model'], **model_cnf['model'])
+            logger.info('Starting no Cluster Training')
             model.train(train_loader, valid_loader, **model_cnf['train'])
         else:
             model = FastAttentionXML(labels_num, data_cnf, model_cnf, tree_id)
+            logger.info('Starting Cluster Training')
             model.train(train_x, train_y, valid_x, valid_y, mlb)
         logger.info('Finish Training')
 
