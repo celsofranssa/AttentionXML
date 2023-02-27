@@ -14,7 +14,7 @@ embedding:
   emb_init: resource/dataset/Wiki10-31k/emb_init.npy
 
 output:
-  res: resource/result
+  res: resource/prediction
 
 labels_binarizer: resource/dataset/Wiki10-31k/labels_binarizer
 
