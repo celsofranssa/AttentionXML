@@ -13,12 +13,12 @@ def _get_metrics(metrics, thresholds):
     return threshold_metrics
 
 
-def _load_labels_cls(dataset):
+def load_label_cls(dataset):
     with open(f"resource/dataset/{dataset}/label_cls.pkl", "rb") as label_cls_file:
         return pickle.load(label_cls_file)
 
 
-def _load_texts_cls(dataset):
+def load_text_cls(dataset):
     with open(f"resource/dataset/{dataset}/text_cls.pkl", "rb") as text_cls_file:
         return pickle.load(text_cls_file)
 
@@ -61,15 +61,14 @@ def get_labels_map(dataset):
         return pickle.load(labels_map_file)
 
 
-def get_ranking(prediction, texts_map, texts_cls, labels_cls, labels_map, cls):
+def get_ranking(prediction, texts_map, text_cls, label_cls, cls):
     ranking = {}
-    for idx, (labels, scores) in enumerate(prediction):
+    for idx, (labels_ids, scores) in enumerate(prediction):
         text_idx = texts_map[idx]
-        if cls in texts_cls[text_idx]:
+        if cls in text_cls[text_idx]:
             labels_scores = {}
-            for label, score in zip(labels, scores):
-                label_idx = labels_map.get(label, -1)  # labels_map[label]
-                if cls in labels_cls.get(label_idx, []):
+            for label_idx, score in zip(labels_ids, scores):
+                if cls in label_cls[int(label_idx)]:
                     labels_scores[f"label_{label_idx}"] = score
             if len(labels_scores) > 0:
                 ranking[f"text_{text_idx}"] = labels_scores
@@ -78,23 +77,23 @@ def get_ranking(prediction, texts_map, texts_cls, labels_cls, labels_map, cls):
 
 def load_prediction(dataset, model, fold_idx):
     return zip(
-        np.load(f"resource/prediction/fold_{fold_idx}/{model}-{dataset}-labels.npy", allow_pickle=True),
-        np.load(f"resource/prediction/fold_{fold_idx}/{model}-{dataset}-scores.npy", allow_pickle=True)
+        np.load(f"resource/result/{model}-{dataset}-{fold_idx}-Ensemble-labels.npy", allow_pickle=True),
+        np.load(f"resource/result/{model}-{dataset}-{fold_idx}-Ensemble-scores.npy", allow_pickle=True)
     )
 
 
 if __name__ == '__main__':
     dataset = "Wiki10-31k"
     model = "AttentionXML"
-    metrics = _get_metrics(["mrr", "recall", "hit_rate"], [1, 5, 10, 100])
+    metrics = _get_metrics(["mrr", "recall", "hit_rate"], [1, 5, 10])
     relevance_map = _load_relevance_map(dataset)
 
     # cls
-    texts_cls = _load_texts_cls(dataset)
-    labels_cls = _load_labels_cls(dataset)
+    text_cls = load_text_cls(dataset)
+    label_cls = load_label_cls(dataset)
 
     # maps
-    labels_map = {v: k for k, v in get_labels_map(dataset).items()}
+    #labels_map = {v: k for k, v in get_labels_map(dataset).items()}
 
     results = []
     rankings = {}
@@ -102,7 +101,7 @@ if __name__ == '__main__':
         prediction = load_prediction(dataset, model, fold_idx)
         texts_map = get_texts_map(dataset, fold_idx, split="test")
         for cls in ["tail"]:
-            ranking = get_ranking(prediction, texts_map, texts_cls, labels_cls, labels_map, cls)
+            ranking = get_ranking(prediction, texts_map, text_cls, label_cls, cls)
             result = evaluate(
                 Qrels(
                     {key: value for key, value in relevance_map.items() if key in ranking.keys()}

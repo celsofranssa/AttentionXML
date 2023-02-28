@@ -5,8 +5,8 @@ export PYTHONPATH=$PATHONPATH:~/projects/AttentionXML/
 
 DATA=Wiki10-31k
 MODEL=AttentionXML
-FOLD=0
+FOLD=3
 
-#bash scripts/run_preprocess.sh $DATA $FOLD
-bash scripts/run_xml.sh $DATA $MODEL
+bash scripts/run_preprocess.sh $DATA $FOLD
+bash scripts/run_xml.sh $DATA $MODEL $FOLD
 
