@@ -33,8 +33,8 @@ def main(dataset, model, fold, prediction_dir, result_dir, trees):
         s = sorted(s.items(), key=lambda x: x[1], reverse=True)
         ensemble_labels.append([x[0] for x in s[:len(labels[0][i])]])
         ensemble_scores.append([x[1] for x in s[:len(labels[0][i])]])
-    np.save(F'{prediction_dir}/{model}-{dataset}-{fold}-Ensemble-labels', np.asarray(ensemble_labels))
-    np.save(F'{prediction_dir}/{model}-{dataset}-{fold}-Ensemble-scores', np.asarray(ensemble_scores))
+    np.save(F'{result_dir}/{model}-{dataset}-{fold}-Ensemble-labels', np.asarray(ensemble_labels))
+    np.save(F'{result_dir}/{model}-{dataset}-{fold}-Ensemble-scores', np.asarray(ensemble_scores))
 
 
 if __name__ == '__main__':

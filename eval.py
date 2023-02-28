@@ -77,8 +77,8 @@ def get_ranking(prediction, texts_map, text_cls, label_cls, cls):
 
 def load_prediction(dataset, model, fold_idx):
     return zip(
-        np.load(f"resource/result/{model}-{dataset}-{fold_idx}-Ensemble-labels.npy", allow_pickle=True),
-        np.load(f"resource/result/{model}-{dataset}-{fold_idx}-Ensemble-scores.npy", allow_pickle=True)
+        np.load(f"resource/prediction/{model}-{dataset}-{fold_idx}-Ensemble-labels.npy", allow_pickle=True),
+        np.load(f"resource/prediction/{model}-{dataset}-{fold_idx}-Ensemble-scores.npy", allow_pickle=True)
     )
 
 
