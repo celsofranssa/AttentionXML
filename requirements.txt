@@ -4,8 +4,8 @@ joblib==1.2.0
 logzero==1.5.0
 nltk==3.4
 numpy==1.22.0
-pandas
+pandas~=1.1.5
 ruamel.yaml==0.16.5
 scikit-learn~=0.22
 scipy==1.10.1
-tqdm
+tqdm~=4.31.1
