@@ -6,6 +6,6 @@ nltk==3.4
 numpy==1.22.0
 pandas
 ruamel.yaml==0.16.5
-scikit-learn==0.22
+scikit-learn~=0.22
 scipy==1.10.1
 tqdm
