@@ -74,7 +74,7 @@ python preprocess_old.py \
 
 Train and predict as follows:
 ```bash
-python main.py --data-cnf setting/dataset/EUR-Lex.yaml --model-cnf setting/model/AttentionXML-EUR-Lex.yaml 
+python main.py --data-cnf setting/dataset/Eurlex-4k.yaml --model-cnf setting/model/AttentionXML-Eurlex-4k.yaml 
 ```
 
 Or do prediction only with option "--mode eval".
