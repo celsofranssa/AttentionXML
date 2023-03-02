@@ -27,4 +27,4 @@ valid:
 predict:
   batch_size: 200
 
-path: model
+path: resource/model_checkpoint

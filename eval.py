@@ -83,9 +83,9 @@ def load_prediction(dataset, model, fold_idx):
 
 
 if __name__ == '__main__':
-    dataset = "Wiki10-31k"
+    dataset = "Eurlex-4k"
     model = "AttentionXML"
-    metrics = _get_metrics(["mrr", "recall", "hit_rate"], [1, 5, 10])
+    metrics = _get_metrics(["mrr", "recall", "ndcg"], [1, 5, 10])
     relevance_map = _load_relevance_map(dataset)
 
     # cls
@@ -97,10 +97,13 @@ if __name__ == '__main__':
 
     results = []
     rankings = {}
-    for fold_idx in [0]:
+    for fold_idx in [0,1,2,3,4]:
+        print(fold_idx)
         prediction = load_prediction(dataset, model, fold_idx)
         texts_map = get_texts_map(dataset, fold_idx, split="test")
+
         for cls in ["tail"]:
+            print(cls)
             ranking = get_ranking(prediction, texts_map, text_cls, label_cls, cls)
             result = evaluate(
                 Qrels(

@@ -1,0 +1,23 @@
+name: Amazon-670k
+
+train:
+  sparse: resource/dataset/Amazon-670k/train_v1.txt
+  texts: resource/dataset/Amazon-670k/train_texts.npy
+  labels: resource/dataset/Amazon-670k/train_labels.npy
+
+valid:
+  size: 4000
+
+test:
+  texts: resource/dataset/Amazon-670k/test_texts.npy
+
+embedding:
+  emb_init: resource/dataset/Amazon-670k/emb_init.npy
+
+output:
+  res: resource/prediction
+
+labels_binarizer: resource/dataset/Amazon-670k/labels_binarizer
+
+model:
+  emb_size: 300

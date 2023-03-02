@@ -118,7 +118,7 @@ class Model(object):
             beta = 1.0 / swa_state['models_num']
             with torch.no_grad():
                 for n, p in self.model.named_parameters():
-                    swa_state[n].mul_(1.0 - beta).add_(beta, p.data)
+                    swa_state[n].mul_(1.0 - beta).add_(p.data, alpha=beta)
 
     def swap_swa_params(self):
         if 'swa' in self.state:

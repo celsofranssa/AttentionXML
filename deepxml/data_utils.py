@@ -43,9 +43,9 @@ def get_word_emb(vec_path, vocab_path=None):
     if vocab_path is not None:
         with open(vocab_path) as fp:
             vocab = {word: idx for idx, word in enumerate(fp)}
-        return np.load(vec_path), vocab
+        return np.load(vec_path, allow_pickle=True), vocab
     else:
-        return np.load(vec_path)
+        return np.load(vec_path, allow_pickle=True)
 
 
 def get_data(text_file, label_file=None):
@@ -83,7 +83,7 @@ def get_mlb(mlb_path, labels=None) -> MultiLabelBinarizer:
 
 def get_sparse_feature(feature_file, label_file):
     sparse_x, _ = load_svmlight_file(feature_file, multilabel=True)
-    return normalize(sparse_x), np.load(label_file) if label_file is not None else None
+    return normalize(sparse_x), np.load(label_file, allow_pickle=True) if label_file is not None else None
 
 
 def output_res(output_path, name, scores, labels):
