@@ -72,6 +72,8 @@ def get_ranking(prediction, texts_map, text_cls, label_cls, cls):
                     labels_scores[f"label_{label_idx}"] = score
             if len(labels_scores) > 0:
                 ranking[f"text_{text_idx}"] = labels_scores
+            else:
+                ranking[f"text_{text_idx}"] = {"label_-1": 0.0}
     return ranking
 
 
@@ -83,8 +85,9 @@ def load_prediction(dataset, model, fold_idx):
 
 
 if __name__ == '__main__':
-    dataset = "Eurlex-4k"
-    model = "AttentionXML"
+
+    dataset = "Amazon-670k"
+    model = "FastAttentionXML"
     metrics = _get_metrics(["mrr", "recall", "ndcg"], [1, 5, 10])
     relevance_map = _load_relevance_map(dataset)
 
@@ -97,7 +100,7 @@ if __name__ == '__main__':
 
     results = []
     rankings = {}
-    for fold_idx in [0,1,2,3,4]:
+    for fold_idx in [0]:
         print(fold_idx)
         prediction = load_prediction(dataset, model, fold_idx)
         texts_map = get_texts_map(dataset, fold_idx, split="test")
@@ -112,6 +115,7 @@ if __name__ == '__main__':
                 Run(ranking),
                 metrics
             )
+
             result = {k: round(v, 3) for k, v in result.items()}
             result["fold"] = fold_idx
             result["cls"] = cls

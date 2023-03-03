@@ -137,7 +137,7 @@ class XMLModel(Model):
     """
     def __init__(self, labels_num, hidden_size, device_ids=None, attn_device_ids=None,
                  most_labels_parallel_attn=80000, **kwargs):
-        parallel_attn = labels_num <= most_labels_parallel_attn
+        parallel_attn = True # labels_num <= most_labels_parallel_attn
         super(XMLModel, self).__init__(hidden_size=hidden_size, device_ids=device_ids, labels_num=labels_num,
                                        parallel_attn=parallel_attn, **kwargs)
         self.network, self.attn_weights = self.model, nn.Sequential()

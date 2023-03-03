@@ -96,6 +96,9 @@ class AttentionWeights(nn.Module):
                 emb.weight.data.uniform_(-std, std)
         self.group_offset, self.hidden_size = np.cumsum([0] + self.group), hidden_size
 
+
+
+
     def forward(self, inputs: torch.Tensor):
         outputs = torch.zeros(*inputs.size(), self.hidden_size, device=inputs.device)
         for left, right, emb in zip(self.group_offset[:-1], self.group_offset[1:], self.emb):
