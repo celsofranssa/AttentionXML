@@ -2,6 +2,7 @@ import pickle
 
 import numpy as np
 import pandas as pd
+import scipy
 from ranx import evaluate, Run, Qrels
 
 
@@ -61,9 +62,10 @@ def get_labels_map(dataset):
         return pickle.load(labels_map_file)
 
 
-def get_ranking(prediction, texts_map, text_cls, label_cls, cls):
+def get_ranking(labels_ids, scores, texts_map, text_cls, label_cls, cls):
     ranking = {}
-    for idx, (labels_ids, scores) in enumerate(prediction):
+    print("Ranking")
+    for idx, (labels_ids, scores) in enumerate(zip(labels_ids, scores)):
         text_idx = texts_map[idx]
         if cls in text_cls[text_idx]:
             labels_scores = {}
@@ -78,17 +80,47 @@ def get_ranking(prediction, texts_map, text_cls, label_cls, cls):
 
 
 def load_prediction(dataset, model, fold_idx):
-    return zip(
-        np.load(f"resource/prediction/{model}-{dataset}-{fold_idx}-Ensemble-labels.npy", allow_pickle=True),
-        np.load(f"resource/prediction/{model}-{dataset}-{fold_idx}-Ensemble-scores.npy", allow_pickle=True)
-    )
+    print("Loading prediction")
+    return np.load(f"resource/prediction/fold_{fold_idx}/{model}-{dataset}-Ensemble-labels.npy", allow_pickle=True), \
+           np.load(f"resource/prediction/fold_{fold_idx}/{model}-{dataset}-Ensemble-scores.npy", allow_pickle=True)
+    # return zip(
+    #     np.load(f"resource/prediction/fold_{fold_idx}/{model}-{dataset}-Ensemble-labels.npy", allow_pickle=True),
+    #     np.load(f"resource/prediction/fold_{fold_idx}/{model}-{dataset}-Ensemble-scores.npy", allow_pickle=True)
+    # )
 
 
-if __name__ == '__main__':
+def checkpoint_results(results, dataset, model):
+    pd.DataFrame(results).to_csv(
+        f"resource/result/{model}_{dataset}.rts",
+        sep='\t', index=False, header=True)
 
-    dataset = "Amazon-670k"
-    model = "FastAttentionXML"
-    metrics = _get_metrics(["mrr", "recall", "ndcg"], [1, 5, 10])
+
+def checkpoint_rankings(rankings, dataset, model):
+    with open(
+            f"resource/ranking/{model}_{dataset}.rnk",
+            "wb") as rankings_file:
+        pickle.dump(rankings, rankings_file)
+
+def mean_confidence_interval(data, confidence=0.95):
+    a = 1.0 * np.array(data)
+    n = len(a)
+    m, se = np.mean(a), scipy.stats.sem(a)
+    h = se * scipy.stats.t.ppf((1 + confidence) / 2., n - 1)
+    return f"{round(100 * m, 1)}({round(100 * h, 1)})"
+
+
+def get_ic(model, dataset):
+    print(f"IC for {model} - {dataset}")
+    result_df = pd.read_csv(f"resource/result/{model}_{dataset}.rts", header=0, sep="\t")
+    for cls in ["tail", "head"]:
+        print(f"Results for {cls}")
+        cls_df = result_df[result_df["cls"] == cls]
+        for metric in ['mrr@1', 'mrr@5', 'mrr@10', 'ndcg@1', 'ndcg@5', 'ndcg@10']:
+            print(f"{metric}: {mean_confidence_interval(cls_df[metric])}")
+
+def get_result(dataset, model):
+
+    metrics = _get_metrics(["mrr", "recall", "ndcg", "precision", "hit_rate"], [1, 5, 10])
     relevance_map = _load_relevance_map(dataset)
 
     # cls
@@ -96,18 +128,20 @@ if __name__ == '__main__':
     label_cls = load_label_cls(dataset)
 
     # maps
-    #labels_map = {v: k for k, v in get_labels_map(dataset).items()}
+    # labels_map = {v: k for k, v in get_labels_map(dataset).items()}
 
     results = []
     rankings = {}
-    for fold_idx in [0]:
-        print(fold_idx)
-        prediction = load_prediction(dataset, model, fold_idx)
+    for fold_idx in [0, 1, 2, 3]:
+        rankings[fold_idx] = {}
+
+        labels, scores = load_prediction(dataset, model, fold_idx)
         texts_map = get_texts_map(dataset, fold_idx, split="test")
 
-        for cls in ["tail"]:
-            print(cls)
-            ranking = get_ranking(prediction, texts_map, text_cls, label_cls, cls)
+        for cls in ["all", "head", "tail"]:
+            print(f"Evaluating on {cls} labels on fold {fold_idx}")
+            ranking = get_ranking(labels, scores, texts_map, text_cls, label_cls, cls)
+            print(f"Ranking size: {len(ranking)}")
             result = evaluate(
                 Qrels(
                     {key: value for key, value in relevance_map.items() if key in ranking.keys()}
@@ -121,5 +155,17 @@ if __name__ == '__main__':
             result["cls"] = cls
 
             results.append(result)
-            # rankings[fold_idx][cls] = ranking
+            rankings[fold_idx][cls] = ranking
     print(pd.DataFrame(results))
+
+    checkpoint_results(results, dataset, model)
+    checkpoint_rankings(rankings, dataset, model)
+
+if __name__ == '__main__':
+    dataset = "Amazon-670k"
+    model = "FastAttentionXML"
+    #get_result(dataset, model)
+    get_ic(model, dataset)
+
+
+
