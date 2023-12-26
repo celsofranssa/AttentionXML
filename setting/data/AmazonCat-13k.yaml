@@ -1,0 +1,22 @@
+name: AmazonCat-13k
+
+train:
+  texts: resource/dataset/AmazonCat-13k/train_texts.npy
+  labels: resource/dataset/AmazonCat-13k/train_labels.npy
+
+valid:
+  size: 4000
+
+test:
+  texts: resource/dataset/AmazonCat-13k/test_texts.npy
+
+embedding:
+  emb_init: resource/dataset/AmazonCat-13k/emb_init.npy
+
+output:
+  res: resource/prediction
+
+labels_binarizer: resource/dataset/AmazonCat-13k/labels_binarizer
+
+model:
+  emb_size: 300
