@@ -1,7 +1,7 @@
-source ~/projects/venvs/AttentionXML/bin/activate
-export PYTHONPATH=$PATHONPATH:~/projects/AttentionXML/
+#source ~/projects/venvs/AttentionXML/bin/activate
+#export PYTHONPATH=$PATHONPATH:~/projects/AttentionXML/
 
-DATA=Eurlex-4k
+DATA=AmazonCat-13k
 MODEL=AttentionXML
 FOLD=0
 
