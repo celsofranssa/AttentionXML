@@ -1,4 +1,5 @@
 import pickle
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -82,7 +83,7 @@ def get_ranking(labels_ids, scores, texts_map, text_cls, label_cls, cls):
 def load_prediction(dataset, model, fold_idx):
     print("Loading prediction")
     return np.load(f"resource/prediction/fold_{fold_idx}/{model}-{dataset}-Ensemble-labels.npy", allow_pickle=True), \
-           np.load(f"resource/prediction/fold_{fold_idx}/{model}-{dataset}-Ensemble-scores.npy", allow_pickle=True)
+        np.load(f"resource/prediction/fold_{fold_idx}/{model}-{dataset}-Ensemble-scores.npy", allow_pickle=True)
     # return zip(
     #     np.load(f"resource/prediction/fold_{fold_idx}/{model}-{dataset}-Ensemble-labels.npy", allow_pickle=True),
     #     np.load(f"resource/prediction/fold_{fold_idx}/{model}-{dataset}-Ensemble-scores.npy", allow_pickle=True)
@@ -101,6 +102,15 @@ def checkpoint_rankings(rankings, dataset, model):
             "wb") as rankings_file:
         pickle.dump(rankings, rankings_file)
 
+
+def checkpoint_ranking(ranking, model, dataset, fold_idx):
+    ranking_dir = f"resource/ranking/{model}_{dataset}/"
+    Path(ranking_dir).mkdir(parents=True, exist_ok=True)
+    print(f"Saving ranking {fold_idx} on {ranking_dir}")
+    with open(f"{ranking_dir}{model}_{dataset}_{fold_idx}.rnk", "wb") as ranking_file:
+        pickle.dump(ranking, ranking_file)
+
+
 def mean_confidence_interval(data, confidence=0.95):
     a = 1.0 * np.array(data)
     n = len(a)
@@ -109,18 +119,23 @@ def mean_confidence_interval(data, confidence=0.95):
     return f"{round(100 * m, 1)}({round(100 * h, 1)})"
 
 
-def get_ic(model, dataset):
-    print(f"IC for {model} - {dataset}")
+def get_ic(model, dataset, metrics, thresholds):
+    print(f"Eval results for {model} in {dataset}:")
     result_df = pd.read_csv(f"resource/result/{model}_{dataset}.rts", header=0, sep="\t")
-    for cls in ["tail", "head"]:
-        print(f"Results for {cls}")
-        cls_df = result_df[result_df["cls"] == cls]
-        for metric in ['mrr@1', 'mrr@5', 'mrr@10', 'ndcg@1', 'ndcg@5', 'ndcg@10']:
-            print(f"{metric}: {mean_confidence_interval(cls_df[metric])}")
+    s = ""
+    for metric in metrics:
+        for cls in ["tail", "head"]:
+            cls_df = result_df[result_df["cls"] == cls]
+            print([f"{metric}@{t}" for t in thresholds])
+            for m in [f"{metric}@{t}" for t in thresholds]: #['ndcg@1', 'ndcg@5', 'ndcg@10', 'ndcg@19']:
+                v = mean_confidence_interval(cls_df[m])
+                s = s + f"{v}\t"
+    print(s)
 
-def get_result(dataset, model):
 
-    metrics = _get_metrics(["mrr", "recall", "ndcg", "precision", "hit_rate"], [1, 5, 10])
+def get_result(dataset, model, folds, metrics, thresholds):
+    metrics = _get_metrics(metrics, thresholds)
+    print(f"Metrics: {metrics}")
     relevance_map = _load_relevance_map(dataset)
 
     # cls
@@ -132,13 +147,13 @@ def get_result(dataset, model):
 
     results = []
     rankings = {}
-    for fold_idx in [0, 1, 2, 3]:
+    for fold_idx in folds:
         rankings[fold_idx] = {}
 
         labels, scores = load_prediction(dataset, model, fold_idx)
         texts_map = get_texts_map(dataset, fold_idx, split="test")
 
-        for cls in ["all", "head", "tail"]:
+        for cls in ["head", "tail"]:
             print(f"Evaluating on {cls} labels on fold {fold_idx}")
             ranking = get_ranking(labels, scores, texts_map, text_cls, label_cls, cls)
             print(f"Ranking size: {len(ranking)}")
@@ -156,16 +171,18 @@ def get_result(dataset, model):
 
             results.append(result)
             rankings[fold_idx][cls] = ranking
+            checkpoint_ranking(rankings[fold_idx], model, dataset, fold_idx)
+
     print(pd.DataFrame(results))
 
     checkpoint_results(results, dataset, model)
-    checkpoint_rankings(rankings, dataset, model)
+
+
 
 if __name__ == '__main__':
-    dataset = "Amazon-670k"
-    model = "FastAttentionXML"
-    #get_result(dataset, model)
-    get_ic(model, dataset)
-
-
-
+    dataset = "AmazonCat-13k"
+    model = "AttentionXML"
+    metrics = ["ndcg", "precision"]
+    thresholds = [1, 5, 10, 6]
+    get_result(dataset, model, folds=[0, 1, 2], metrics=metrics, thresholds=thresholds)
+    get_ic(model, dataset, metrics, thresholds)

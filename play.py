@@ -27,6 +27,7 @@ def checkpoint_samples(samples_df, dataset, split):
     samples_df["labels"].to_csv(f"data/{dataset}/{split}_labels.txt", header=False, index=False)
 
 
+
 if __name__ == '__main__':
     dataset = "Wiki10-31k"
     fold_idx = 0
