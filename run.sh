@@ -1,5 +1,5 @@
-#source ~/projects/venvs/AttentionXML/bin/activate
-#export PYTHONPATH=$PATHONPATH:~/projects/AttentionXML/
+source venv/bin/activate
+export PYTHONPATH=$PATHONPATH:$pwd
 
 DATA=AmazonCat-13k
 MODEL=AttentionXML
